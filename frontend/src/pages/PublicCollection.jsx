@@ -19,7 +19,7 @@ export const PublicCollection = () => {
   const [customerName, setCustomerName] = useState('');
   const [customerEmail, setCustomerEmail] = useState('');
   const [companyRole, setCompanyRole] = useState('');
-  const [rating, setRating] = useState(5);
+  const [rating, setRating] = useState(0);
   const [reviewText, setReviewText] = useState('');
   const [avatar, setAvatar] = useState('');
 
@@ -80,6 +80,11 @@ export const PublicCollection = () => {
 
     if (!customerEmail.trim() || !customerEmail.includes('@')) {
       setSubmitError('Please enter a valid email address (e.g. name@company.com).');
+      return;
+    }
+
+    if (space?.showRating && (rating === 0 || !rating)) {
+      setSubmitError('Please select a star rating by clicking on the stars.');
       return;
     }
 
@@ -193,7 +198,9 @@ export const PublicCollection = () => {
                     onChange={(r) => setRating(r)}
                     size="lg"
                   />
-                  <p className="text-xs text-amber-400 font-semibold">{rating} of 5 Stars</p>
+                  <p className="text-xs text-amber-400 font-semibold">
+                    {rating > 0 ? `${rating} of 5 Stars` : 'Click to select star rating'}
+                  </p>
                 </div>
               )}
 
