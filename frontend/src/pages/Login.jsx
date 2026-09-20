@@ -14,6 +14,17 @@ export const Login = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const formatErrorMessage = (err) => {
+    const detail = err.response?.data?.detail;
+    if (Array.isArray(detail)) {
+      return detail.map((item) => item.msg || item.message).join('. ');
+    }
+    if (typeof detail === 'string') {
+      return detail;
+    }
+    return 'Invalid email or password. Please try again.';
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -23,7 +34,7 @@ export const Login = () => {
       await login(email, password);
       navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.detail || 'Invalid login credentials. Please try again.');
+      setError(formatErrorMessage(err));
     } finally {
       setLoading(false);
     }
@@ -35,7 +46,7 @@ export const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#090d16] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[#090d16] flex items-center justify-center p-4 font-sans">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="w-12 h-12 rounded-2xl coss-gradient-bg flex items-center justify-center mx-auto mb-3 shadow-lg shadow-indigo-500/30">
@@ -48,7 +59,7 @@ export const Login = () => {
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
             {error && (
-              <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs font-medium">
+              <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs font-medium leading-relaxed">
                 {error}
               </div>
             )}

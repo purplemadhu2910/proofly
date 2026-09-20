@@ -15,9 +15,26 @@ export const Signup = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const formatErrorMessage = (err) => {
+    const detail = err.response?.data?.detail;
+    if (Array.isArray(detail)) {
+      return detail.map((item) => item.msg || item.message).join('. ');
+    }
+    if (typeof detail === 'string') {
+      return detail;
+    }
+    return 'Failed to create account. Please check your inputs.';
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters long.');
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -25,7 +42,7 @@ export const Signup = () => {
       // Navigate to Space Creation Wizard for new account
       navigate('/dashboard/spaces/new');
     } catch (err) {
-      setError(err.response?.data?.detail || 'Failed to create account. Please check your inputs.');
+      setError(formatErrorMessage(err));
     } finally {
       setLoading(false);
     }
@@ -45,7 +62,7 @@ export const Signup = () => {
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
             {error && (
-              <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs font-medium">
+              <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs font-medium leading-relaxed">
                 {error}
               </div>
             )}
