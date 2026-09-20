@@ -20,14 +20,20 @@ export const Layout = () => {
     }
 
     const fetchOwnerSpaces = async () => {
+      setLoadingSpaces(true);
       try {
         const res = await getSpaces();
-        setSpaces(res.data);
-        if (res.data.length > 0) {
-          setCurrentSpace(res.data[0]);
+        const loadedSpaces = res.data || [];
+        setSpaces(loadedSpaces);
+        if (loadedSpaces.length > 0) {
+          setCurrentSpace(loadedSpaces[0]);
+        } else {
+          setCurrentSpace(null);
         }
       } catch (err) {
         console.error("Error loading owner spaces:", err);
+        setSpaces([]);
+        setCurrentSpace(null);
       } finally {
         setLoadingSpaces(false);
       }
@@ -40,7 +46,7 @@ export const Layout = () => {
 
   if (authLoading || (user && loadingSpaces)) {
     return (
-      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center space-y-4">
+      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center space-y-4 font-sans">
         <div className="w-12 h-12 rounded-2xl coss-gradient-bg animate-pulse flex items-center justify-center text-white font-extrabold text-xl shadow-lg shadow-indigo-500/30">
           P
         </div>

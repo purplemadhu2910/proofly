@@ -22,7 +22,8 @@ export const Signup = () => {
 
     try {
       await signup(name, email, password);
-      navigate('/dashboard');
+      // Navigate to Space Creation Wizard for new account
+      navigate('/dashboard/spaces/new');
     } catch (err) {
       setError(err.response?.data?.detail || 'Failed to create account. Please check your inputs.');
     } finally {
@@ -31,7 +32,7 @@ export const Signup = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#090d16] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[#090d16] flex items-center justify-center p-4 font-sans">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="w-12 h-12 rounded-2xl coss-gradient-bg flex items-center justify-center mx-auto mb-3 shadow-lg shadow-indigo-500/30">
