@@ -4,20 +4,13 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from app.config import settings
-from app.database import connect_to_mongo, get_database, close_mongo_connection
+from app.database import connect_to_mongo, close_mongo_connection
 from app.routes import auth, spaces, testimonials, public, analytics, embed
-from seed import auto_seed_if_empty
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup: Connect to Mongo
     await connect_to_mongo()
-    db = get_database()
-    if db is not None:
-        try:
-            await auto_seed_if_empty(db)
-        except Exception as seed_err:
-            print(f"Auto-seed notice: {seed_err}")
     yield
     # Shutdown: Close connection
     await close_mongo_connection()
