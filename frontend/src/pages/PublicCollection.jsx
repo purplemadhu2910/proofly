@@ -6,7 +6,7 @@ import { Input, Textarea, Label } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
 import { RatingStars } from '../components/ui/RatingStars';
 import { Skeleton } from '../components/ui/Skeleton';
-import { Sparkles, CheckCircle2, Upload, MessageSquareQuote, Star } from 'lucide-react';
+import { Sparkles, CheckCircle2, Upload, MessageSquareQuote } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 export const PublicCollection = () => {
@@ -57,20 +57,49 @@ export const PublicCollection = () => {
     }
   };
 
+  const formatErrorDetail = (err) => {
+    const detail = err.response?.data?.detail;
+    if (Array.isArray(detail)) {
+      return detail.map((item) => item.msg || item.message).join('. ');
+    }
+    if (typeof detail === 'string') {
+      return detail;
+    }
+    return 'Failed to submit feedback. Please check your inputs.';
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitError('');
+
+    // Pre-submission client-side validation
+    if (!customerName.trim()) {
+      setSubmitError('Please enter your name.');
+      return;
+    }
+
+    if (!customerEmail.trim() || !customerEmail.includes('@')) {
+      setSubmitError('Please enter a valid email address (e.g. name@company.com).');
+      return;
+    }
+
+    if (reviewText.trim().length < 5) {
+      setSubmitError('Review text must be at least 5 characters long.');
+      return;
+    }
+
     setSubmitting(true);
 
     try {
       await submitPublicTestimonial(spaceSlug, {
-        customerName,
-        customerEmail,
+        customerName: customerName.trim(),
+        customerEmail: customerEmail.trim().toLowerCase(),
         companyRole: companyRole.trim() || 'Customer',
         rating,
-        reviewText,
+        reviewText: reviewText.trim(),
         avatar: avatar.trim() || undefined
       });
+
       setSubmitSuccess(true);
       
       // Trigger celebratory confetti burst
@@ -82,7 +111,7 @@ export const PublicCollection = () => {
         });
       } catch (e) {}
     } catch (err) {
-      setSubmitError(err.response?.data?.detail || 'Failed to submit feedback. Please check your inputs.');
+      setSubmitError(formatErrorDetail(err));
     } finally {
       setSubmitting(false);
     }
@@ -90,7 +119,7 @@ export const PublicCollection = () => {
 
   if (loadingSpace) {
     return (
-      <div className="min-h-screen bg-[#090d16] flex items-center justify-center p-4">
+      <div className="min-h-screen bg-[#090d16] flex items-center justify-center p-4 font-sans">
         <Card className="w-full max-w-lg text-center py-12 space-y-4">
           <Skeleton height="h-12" width="w-12" className="mx-auto rounded-full" />
           <Skeleton height="h-6" width="w-48" className="mx-auto" />
@@ -102,7 +131,7 @@ export const PublicCollection = () => {
 
   if (errorSpace || !space) {
     return (
-      <div className="min-h-screen bg-[#090d16] flex items-center justify-center p-4">
+      <div className="min-h-screen bg-[#090d16] flex items-center justify-center p-4 font-sans">
         <Card className="w-full max-w-md text-center py-12 space-y-4">
           <div className="w-12 h-12 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center mx-auto text-rose-400">
             <MessageSquareQuote className="w-6 h-6" />
@@ -141,7 +170,7 @@ export const PublicCollection = () => {
               <CheckCircle2 className="w-8 h-8 animate-bounce" />
             </div>
             <h3 className="text-2xl font-extrabold text-white">Thank you!</h3>
-            <p className="text-slate-300 text-sm max-w-md mx-auto">
+            <p className="text-slate-300 text-sm max-w-md mx-auto leading-relaxed">
               Your feedback has been submitted successfully. We deeply appreciate your support and response!
             </p>
           </CardContent>
@@ -149,7 +178,7 @@ export const PublicCollection = () => {
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-6 pt-6">
               {submitError && (
-                <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs">
+                <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs font-medium leading-relaxed">
                   {submitError}
                 </div>
               )}
